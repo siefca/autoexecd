@@ -1,7 +1,7 @@
 /*   autoexecd -- automaticaly executes user's starting scripts at boot time
      version 1.0 , release 5
      
-     Copyright (c) 1999 Pawe³ Wilk 
+     Copyright (c) 1999 Pawel Wilk 
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
      along with this program; if not, write to the Free Software
      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-     Pawe³ Wilk can be contacted via e-mail: <siefca@gnu.org>
+     Pawel Wilk can be contacted via e-mail: <siefca@gnu.org>
      
      The latest version of autoexecd should be accessible at:
      ftp://dione.ids.pl/~siewca/open_source/
@@ -35,6 +35,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "version.c"
 #include "ad_messages.h"
