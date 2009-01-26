@@ -18,7 +18,7 @@ $(AUTOEXECD): $(AUTOEXECD).c $(NEEDED)
 	@echo "compiling $(AUTOEXECD).c"
 	$(CC) $(CCOPTS) $(AUTOEXECD).c -o $(AUTOEXECD)
 	@echo "fixing permisions..."
-	@chmod --changes o-x $(AUTOEXECD)
+	@chmod og-rwx $(AUTOEXECD)
 	@echo "now type 'make install' to install the daemon..."
 
 clean:
@@ -35,9 +35,9 @@ rinstall:
 	@cp -v -f etc/rc.d/init.d/$(AUTOEXECD) $(RCPATH)
 	@cp -v -f -R usr/man/* $(MANPATH)
 	@echo "fixing permisions..."
-	@chmod --changes u=rwx,g+rx $(BINPATH)/$(AUTOEXECD)
-	@chmod --changes u=rw $(ETCPATH)/$(CONFIGFILE)
-	@chmod --changes u=rwx,go+rx $(RCPATH)/$(AUTOEXECD)
+	@chmod u=rwx,g+rx,o-rwx $(BINPATH)/$(AUTOEXECD)
+	@chmod u=rw $(ETCPATH)/$(CONFIGFILE)
+	@chmod u=rwx,go+rx $(RCPATH)/$(AUTOEXECD)
 	@echo "adding to chkconfig..."
 	@chkconfig --add $(AUTOEXECD) 
 
