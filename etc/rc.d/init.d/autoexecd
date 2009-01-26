@@ -1,0 +1,38 @@
+#! /bin/sh
+#
+# autoexecd          Start or stop autoexecd daemon.
+#
+# description: Executes users' startscripts at boot-time.
+#              
+# processname: autoexecd
+# config: /etc/autoexec.conf
+# pidfile: /var/run/autoexecd.pid
+# chkconfig: 2345 80 30
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting autoexecd: "
+	daemon autoexecd
+	echo
+	touch /var/lock/subsys/autoexecd
+	;;
+  stop)
+	echo -n "Stopping autoexecd: "
+	killproc autoexecd
+	echo
+	rm -f /var/lock/subsys/autoexecd
+	;;
+  status)
+        status autoexecd
+        autoexecd -s
+	;;
+  *)
+	echo "Usage: autoexecd {start|stop|status}"
+	exit 1
+esac
+
+exit 0

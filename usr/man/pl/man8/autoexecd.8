@@ -1,0 +1,154 @@
+.\" {PTM/PW/0.1/03-15-1999/"uruchom pliki startowe"}
+.\" Copyright (c) 1999 Pawe³ Wilk
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" The GNU General Public License's references to "object code"
+.\" and "executables" are to be interpreted as the output of any
+.\" document formatting or typesetting system, including
+.\" intermediate and printed output.
+.\"
+.\" This manual is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this manual; if not, write to the Free
+.\" Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
+.\" USA.
+.\"
+.TH AUTOEXECD 8 "8 Marca 1998" "Linux 2.2" "Podrêcznik Administratora Systemu Linux"
+.SH NAZWA
+autoexecd \- demon dla blondynek
+.SH SK£ADNIA
+.BI "autoexecd [\-sV]"
+.SH OPCJE
+.BR autoexecd :
+.TP
+.B \-V
+Drukuje wersjê i nie robi nic wiêcej.
+.TP
+.B \-s
+Drukuje informacjê o aktualnych ustawieniach (sprawdza plik konfiguracyjny)
+i koñczy pracê.
+.SH OPIS
+Demon \fBautoexecd\fP
+przeznaczony jest do uruchamiania plików u¿ytkowników w czasie
+startu systemu. Najczê¶ciej wywo³ywany jest z poziomu
+skryptów startowych \fBrc\fP, na samym pocz±tku pracy. Zaraz po uruchomieniu
+\fBautoexecd\fP zaczyna skanowaæ obecne procesy czekaj±c na pojawienie siê 
+procesu o nazwie \fBgetty\fP. 
+.LP
+To czy getty jest obecny jest dla demona informacj±, 
+¿e zakoñczone zosta³y wszelkie robocze ³adowania i mo¿na zacz±æ
+uruchamiaæ pliki u¿ytkowników (które mog± przecie¿ korzystaæ z jakich¶ us³ug
+uruchomionych po \fBautoexecd\fP i przed \fBgetty\fP).
+Okres czekania na proces wynosi domy¶lnie 80 sekund. 
+Je¶li oczekiwany proces nie pojawi siê w tym czasie 
+to demon koñczy sw± pracê i nie podejmuje ju¿ ¿adnych dzia³añ.
+.LP
+Gdy szukany proces zostanie wykryty to autoexecd odczeka 2 sekundy 
+i rozpocznie skanowanie pliku 
+.IR "/etc/passwd" ". " 
+Dla ka¿dego odnalezionego u¿ytkownika
+utworzony bêdzie nowy proces o efektywnym i rzeczywistym identyfikatorze
+równym identyfikatorowi u¿ytkownika, a tak¿e o efektywnym i rzeczywistym 
+identyfikatorze grupy równym identyfikatorowi g³ównej grupy u¿ytkownika.
+Tak przygotowany proces zmienia swój katalog bie¿±cy na katalog domowy
+uzyskany z /etc/passwd i próbuje uruchomiæ plik
+.IR ".autoexec" ". "
+Po pomy¶lnym utworzeniu nowego procesu demon autoexecd czeka chwilê 
+(domy¶lnie 5 sekund) i przechodzi do kolejnego wpisu w /etc/passwd.
+W przypadku b³êdu nastêpna pozycja passwd jest wczytywana bez oczekiwania.
+B³±d powstaje i nowy proces nie jest tworzony gdy:
+.LP
+.ce 5
+\- wczytywany u¿ytkownik ma UID równy 0,
+\- wczytywany u¿ytkownik nie posiada katalogu domowego,
+\- w katalogu domowym u¿ytkownika nie ma pliku .autoexec,
+\- u¿ytkownik nie ma uprawnieñ by wykonywaæ plik .autoexec,
+\- wyst±pi³ b³±d w tworzeniu nowego procesu.
+.LP
+Ka¿dy proces u¿ytkownika zanim wczyta .autoexec 
+próbuje otworzyæ do nadpisywania dwa pliki z podkatalogu
+.IR "autoexec" 
+mieszcz±cego siê w katalogu domowym. Nazwy tych plików to
+.IR "stdout" 
+oraz
+.IR "stderr" ". "
+Do pierwszego z nich przekierowywany jest standardowy strumieñ wej¶ciowy
+za¶ do drugiego standardowy strumieñ b³êdów. Je¶li dostêp do którego¶ z 
+tych plików jest niemo¿liwy (np. brak jest katalogu autoexec) to dany 
+strumieñ kierowany jest do
+.IR "/dev/null" ". " 
+Je¶li który¶ z plików nie istnieje to jest tworzony.
+.LP
+.SH KONFIGURACJA
+Autoexecd zaraz po uruchomieniu czyta plik konfiguracyjny
+.IR "/etc/autoexecd.conf" ". " 
+Mo¿esz dowolnie zmieniaæ ten plik tak by dostosowaæ dzia³anie autoexecd. Oto
+mo¿liwe opcje podawane w formacie "opcja" "warto¶æ" (znaki dwukropka wchodz± w 
+sk³ad tekstu opcji):
+.LP
+.TP
+.BI "wait for process:" " nazwa"
+mo¿liwo¶æ zast±pienia domy¶lnego getty przez inny proces
+.TP
+.BI "delay after:" " czas"
+czas oczekiwania (w sekundach) po tym jak demon znajdzie 
+ju¿ proces na który czeka³
+.TP
+.BI "delay between:" " czas"
+czas "odpoczynku" miêdzy kolejnymi udanymi wywo³aniami procesów u¿ytkowników
+.TP
+.BI "pass after:" " czas"
+czas po którym demon zaprzestaje czekaæ na maj±cy pojawiæ siê proces
+.TP
+.B "forced execute" 
+dodanie tego wpisu w pliku konfiguracyjnym spowoduje przej¶cie demona do
+dalszych dzia³añ nawet je¶li w ci±gu ustalonego czasu nie pojawi siê
+oczekiwany proces
+.TP
+.B "disabled-for" 
+wszystkie linie pliku konfiguracyjnego umieszczone po tym znaczniku 
+bêd± przeszukane pod k±tem znalezienia nazw u¿ytkowników, dla których
+demon autoexecd nie zadzia³a. Nazwy mog± byæ oddzielone znakami
+tabulacji, spacji b±d¼ spacji (tabulacji) i przecinków.
+Koniec sekcji z zabronionymi u¿ytkownikami oznaczany jest wpisem
+.B "eof-disabled-for"
+.TP
+.BI "nice value:" " warto¶æ"
+warto¶æ nice tworzonych procesów
+.TP
+.BI "umask:" " warto¶æ (oktalnie)"
+maska trybu tworzenia pliku dla demona i tworzonych procesów
+.LP
+Wszelkie linie pliku konfiguracyjnego wystêpuj±ce 
+po znaku'#' s± traktowane jako komentarze.
+.LP
+Je¶li nie mo¿na pobraæ jakiej¶ opcji to zostaje ona zast±piona warto¶ci±
+domy¶ln±.
+.SH 
+.SH PLIKI
+.I /usr/sbin/autoexecd 
+program demona
+.LP
+.I /etc/autoexecd.conf
+plik konfiguracyjny
+
+.SH "ZOBACZ TE¯"
+.BR login (1),
+.BR passwd (1),
+.BR getty (8).
+
+.SH HISTORIA
+Pomys³ na
+.B autoexecd
+zrodzi³ siê przy okazji Dnia Kobiet i zosta³ przeniesiony do
+rzeczywisto¶ci by u³atwiæ ¿ycie wszelkim blondynkom (blondynom te¿).
+.SH AUTOR
+Copyright (C) 1999 by Pawe³ Wilk <siefca@gnu.org>
